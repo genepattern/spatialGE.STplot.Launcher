@@ -1,0 +1,46 @@
+[
+  {
+      "name": "sample_093d",
+      "total_spots": 1532,
+      "total_genes": 22972,
+      "min_counts": 230,
+      "avg_counts": 18560,
+      "max_counts": 88830,
+      "min_genes": 198,
+      "avg_genes": 4861,
+      "max_genes": 9825
+  },
+  {
+    "name": "sample_396a",
+    "total_spots": 1111,
+    "total_genes": 22972,
+    "min_counts": 230,
+    "avg_counts": 18560,
+    "max_counts": 88830,
+    "min_genes": 198,
+    "avg_genes": 4861,
+    "max_genes": 9825
+  },
+  {
+    "name": "sample_396c",
+    "total_spots": 2222,
+    "total_genes": 22972,
+    "min_counts": 230,
+    "avg_counts": 18560,
+    "max_counts": 88830,
+    "min_genes": 198,
+    "avg_genes": 4861,
+    "max_genes": 9825
+  },
+  {
+    "name": "sample_397d",
+    "total_spots": 3333,
+    "total_genes": 22972,
+    "min_counts": 230,
+    "avg_counts": 18560,
+    "max_counts": 88830,
+    "min_genes": 198,
+    "avg_genes": 4861,
+    "max_genes": 9825
+  }
+]
