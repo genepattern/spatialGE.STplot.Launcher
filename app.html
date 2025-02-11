@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>spatialGE.STplot.Launcher</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Import Bootstrap -->
+        <link rel="stylesheet" href="visualizer/bootstrap/css/bootstrap.min.css">
+        <script src="visualizer/jquery/jquery-3.7.1.min.js"></script>
+        <script src="visualizer/bootstrap/js/popper.min.js"></script>
+        <script src="visualizer/bootstrap/js/bootstrap.min.js"></script>
+
+        <!-- Load Vue -->
+        <script src="visualizer/vue/vue.global.min.js"></script>
+
+        <!-- Import Font Awesome -->
+        <link href="visualizer/fontawesome/css/fontawesome.css" rel="stylesheet" />
+        <link href="visualizer/fontawesome/css/solid.css" rel="stylesheet" />
+    </head>
+    <body id="app" >
+        <form id="form-collapse" class="container mt-3" @submit.prevent="handle_submit">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Generate figures with STplot</h3>
+                    <p>STplot generates high-quality figures showing the expression of genes in a spatial context.</p>
+                    <p>The quilt plots present each spot or cell as a point, colored according to the expression of one or 
+                        more genes the user selects. It is a quick way to present spatial gene expression.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div id="error" class="alert alert-danger col-md-12 d-none"></div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <h4>Search and select genes <small><i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="Enter one or more genes for which to generate plots. The text box has auto-complete capabilities."></i></small></h4>
+<!--                    <input id="genes" class="form-control" type="text" v-model="form.genes" />-->
+                    <select id="genes" class="form-control form-select" name="genes[]" v-model="form.genes"></select>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <h4>Select samples to include</h4>
+                    <table id="samples" class="table table-striped">
+                        <thead><tr>
+                            <th><input id="check-all" type="checkbox" @click="toggle_samples"></th>
+                            <th>Sample Name</th>
+                            <th>Total spots/cells</th>
+                            <th>Total genes</th>
+                            <th>Min. counts</th>
+                            <th>Avg. counts</th>
+                            <th>Max. counts</th>
+                            <th>Min. genes</th>
+                            <th>Avg. genes</th>
+                            <th>Max. genes</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr id="sample-loading">
+                                <td colspan="10"><h3 class="text-center"><i class="fa-solid fa-spinner fa-spin"></i></h3></td>
+                            </tr>
+                            <tr v-for="(sample, index) in samples" :key="index">
+                                <td><input type="checkbox" class="form-control form-check" :name="`${sample.sample_name}`" :id="`sample-${index}`" :value="sample.value" v-model="sample.selected"></td>
+                                <td>{{ sample.sample_name }}</td>
+                                <td>{{ sample.spotscells }}</td>
+                                <td>{{ sample.genes }}</td>
+                                <td>{{ sample.min_counts_per_spotcell }}</td>
+                                <td>{{ sample.mean_counts_per_spotcell }}</td>
+                                <td>{{ sample.max_counts_per_spotcell }}</td>
+                                <td>{{ sample.min_genes_per_spotcell }}</td>
+                                <td>{{ sample.mean_genes_per_spotcell }}</td>
+                                <td>{{ sample.max_genes_per_spotcell }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <h4 class="col-md-12">Display Options</h4>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-4">
+                    <label class="form-label" for="colors"><strong>Color palette</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="Select a colot palette for the generated plots"></i></label>
+                    <select id="colors" class="form-control form-select" v-model="form.colors">
+                        <option value="BuRd">BuRd</option>
+                        <option value="highcontrast">highcontrast</option>
+                        <option value="YlOrBr">YlOrBr</option>
+                        <option value="discreterainbow">discreterainbow</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label" for="pointSize"><strong>Point size</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="The size of the point in the plots representing each Region of Interest (ROI), spot, or cell. The default (2) works for most situations."></i></label>
+                    <input type="number" class="form-control form-range" id="pointSize" step="0.1" min="0.1" max="5" value="2.0" v-model.number="form.pointSize">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="pointSizeSlider" class="form-label">&nbsp</label>
+                    <input type="range" class="form-control form-range" id="pointSizeSlider" step="0.1" min="0.1" max="5" value="2.0" v-model.number="form.pointSize" >
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <h4 class="col-md-12">Grid Options</h4>
+            </div>
+            
+            <div class="row mt-2">
+                <div class="col-md-4">
+                    <label class="form-label" for="grid"><strong>Display in grid</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="TWhether to display the results in a singular grid containing all plots. If set to false, each plot will be saved as its own image file."></i></label>
+                    <select id="grid" class="form-control form-select" v-model="form.grid">
+                        <option value="FALSE">One plot per image</option>
+                        <option value="TRUE">Arrange plots in grid</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-none">
+                    <label class="form-label" for="rows"><strong>Rows</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="The number of rows in the grid containing all plots. Ignored unless display in grid is set to true."></i></label>
+                    <input type="number" class="form-control form-range" id="rows" min="1" max="10" value="3" v-model.number="form.rows">
+                </div>
+
+                <div class="col-md-2 d-none">
+                    <label class="form-label" for="columns"><strong>Columns</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="The number of columns in the grid containing all plots. Ignored unless display in grid is set to true."></i></label>
+                    <input type="number" class="form-control form-range" id="columns" min="1" max="10" value="3" v-model.number="form.columns">
+                </div>
+
+                <div class="col-md-2 d-none">
+                    <label class="form-label" for="legend"><strong>Legend</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="Whether the grid of plots should share a common legend. If set to false, each grid will have its own accompanying legend. Ignored unless display in grid is set to true."></i></label>
+                    <select id="legend" class="form-control form-select" v-model="form.legend">
+                        <option value="TRUE">Common</option>
+                        <option value="FALSE">Separate</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-none">
+                    <label class="form-label" for="legendLocation"><strong>&nbsp;</strong></label>
+                    <select id="legendLocation" class="form-control form-select" v-model="form.location">
+                        <option value="bottom">Bottom</option>
+                        <option value="top">Top</option>
+                        <option value="right">Right</option>
+                        <option value="left">Left</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-5 clust-only d-none">
+                <h4 class="col-md-12">Domain Options</h4>
+            </div>
+
+            <div class="row mt-2 clust-only d-none">
+                <div class="col-md-4">
+                    <label class="form-label" for="spatialWeights"><strong>Spatial Weights</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="Plot tissue domains for clusters created using the following spatial weights. Provide as a comma separated list. Must match spatial weights previously used in spatialGE.STclust."></i></label>
+                    <select id="spatialWeights" class="form-control form-select" v-model="form.spatialWeights">
+                        <option v-for="w in weights" :key="w" :value="w">
+                            {{ w }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="deepSplit"><strong>Deep Split</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="Whether deepSplit was used in the earlier spatialGE.STclust step. If you have not previously run spatialGE.STclust with this data, leave the value blank."></i></label>
+                    <select id="deepSplit" class="form-control form-select" v-model="form.deepSplit">
+                        <option value=""></option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-2 clust-only d-none">
+                <div class="col-md-4">
+                    <label class="form-label" for="dynamicTreeCut"><strong>Dynamic Tree Cut</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="Whether the number of clusters was determined using Dynamic Tree Cut in the earlier spatialGE.STclust step. If you have not previously run spatialGE.STclust with this data, leave the value blank."></i></label>
+                    <select id="dynamicTreeCut" class="form-control form-select" v-model="form.dynamicTreeCut">
+                        <option value=""></option>
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-none">
+                    <label class="form-label" for="minimumClusters"><strong>Minimum Clusters</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="The minimum number of clusters (tissue domains) to plot. Must match one of of the clusterings previously run in spatialGE.STclust. Only used if Dynamic Tree Cut is false."></i></label>
+                    <input type="number" class="form-control" id="minimumClusters" step="1" min="2" value="" v-model.number="form.minimumClusters">
+                </div>
+                <div class="col-md-4 d-none">
+                    <label class="form-label" for="maximumClusters"><strong>Maximum Clusters</strong> <i class="fa-solid fa-circle-info text-muted" data-toggle="tooltip" title="The maximum number of clusters (tissue domains) to plot. Must match one of of the clusterings previously run in spatialGE.STclust. Only used if Dynamic Tree Cut is false."></i></label>
+                    <input type="number" class="form-control" id="maximumClusters" step="1" min="2" value="" v-model.number="form.maximumClusters">
+                </div>
+            </div>
+
+            <div class="row mt-3 mb-5">
+                <div class="col-md-4">
+                    <button class="btn btn-lg btn-primary" type="submit">Run STplot</button>
+                </div>
+                <div class="col-md-4 mt-2">
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+        </form>
+        <div id="results-collapse" class="container mt-3 d-none">
+            <nav class="navbar navbar-dark bg-dark row rounded mt-3">
+                <div class="col-md-4 mt-2">
+                    <h3 id="job-status" class="navbar-brand font-weight-bold"></h3>
+                </div>
+                <div class="col-md-8">
+                    <p class="lead text-white mt-3 text-right">Submitted jobs may take several minutes to complete.</p>
+                </div>
+            </nav>
+            <div class="row mt-3 mb-3">
+                <div id="job-results" class="col-md-12">
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="js/app.js"></script>
+        <script>
+            $(document).ready(() => {
+                $('[data-toggle="tooltip"]').tooltip({ placement: 'top' });
+                $('#form-collapse').collapse();
+            });
+        </script>
+    </body>
+</html>

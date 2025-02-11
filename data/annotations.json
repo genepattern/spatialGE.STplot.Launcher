@@ -1,0 +1,150 @@
+{
+  "annotation_variables": [
+    {
+      "label": "STclust; Domains (k): 02; No spatial weight",
+      "value": "stclust_spw0_k2"
+    },
+    {
+      "label": "STclust; Domains (k): 02; spatial weight:0.02",
+      "value": "stclust_spw0.02_k2"
+    },
+    {
+      "label": "STclust; Domains (k): 03; No spatial weight",
+      "value": "stclust_spw0_k3"
+    },
+    {
+      "label": "STclust; Domains (k): 03; spatial weight:0.02",
+      "value": "stclust_spw0.02_k3"
+    },
+    {
+      "label": "STclust; Domains (k): 04; No spatial weight",
+      "value": "stclust_spw0_k4"
+    },
+    {
+      "label": "STclust; Domains (k): 04; spatial weight:0.02",
+      "value": "stclust_spw0.02_k4"
+    },
+    {
+      "label": "STclust; Domains (k): 05; No spatial weight",
+      "value": "stclust_spw0_k5"
+    },
+    {
+      "label": "STclust; Domains (k): 05; spatial weight:0.02",
+      "value": "stclust_spw0.02_k5"
+    }
+  ],
+  "annotation_variables_clusters": [
+    {
+      "annotation": "stclust_spw0_k2",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0_k2",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0_k3",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0_k3",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0_k3",
+      "cluster": "3"
+    },
+    {
+      "annotation": "stclust_spw0_k4",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0_k4",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0_k4",
+      "cluster": "3"
+    },
+    {
+      "annotation": "stclust_spw0_k4",
+      "cluster": "4"
+    },
+    {
+      "annotation": "stclust_spw0_k5",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0_k5",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0_k5",
+      "cluster": "3"
+    },
+    {
+      "annotation": "stclust_spw0_k5",
+      "cluster": "4"
+    },
+    {
+      "annotation": "stclust_spw0_k5",
+      "cluster": "5"
+    },
+    {
+      "annotation": "stclust_spw0.02_k2",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0.02_k2",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0.02_k3",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0.02_k3",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0.02_k3",
+      "cluster": "3"
+    },
+    {
+      "annotation": "stclust_spw0.02_k4",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0.02_k4",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0.02_k4",
+      "cluster": "3"
+    },
+    {
+      "annotation": "stclust_spw0.02_k4",
+      "cluster": "4"
+    },
+    {
+      "annotation": "stclust_spw0.02_k5",
+      "cluster": "1"
+    },
+    {
+      "annotation": "stclust_spw0.02_k5",
+      "cluster": "2"
+    },
+    {
+      "annotation": "stclust_spw0.02_k5",
+      "cluster": "3"
+    },
+    {
+      "annotation": "stclust_spw0.02_k5",
+      "cluster": "4"
+    },
+    {
+      "annotation": "stclust_spw0.02_k5",
+      "cluster": "5"
+    }
+  ]
+}
