@@ -195,6 +195,11 @@ Vue.createApp({
 
                 document.getElementById('job-status').innerHTML = status;
             });
+            
+            window.show_plot = (url) => {
+                document.querySelector('#displayedplot').innerHTML = 
+                    `<img src="${url}" class="img mx-auto d-block" style="max-width: 500px;">`;
+            };
 
             // Show the job results
             let result_html = `<table class="table table-sm table-striped">
@@ -206,13 +211,19 @@ Vue.createApp({
                                   </thead>
                                   <tbody>`;
             for (const result of job.outputFiles) {
-                result_html += `<tr><td>${result.link.name}</td>
-                                    <td>
-                                        <a href="${result.link.href}?download" target="_blank" class="btn btn-secondary btn-sm">Download</a> 
-                                        <a href="Javascript:window.open('${result.link.href}');" class="btn btn-secondary btn-sm">Open in New Tab</a></td></tr>`;
-                console.log(result);
+                if (result.link.href.endsWith('.jpg'))
+                    result_html += `<tr><td>${result.link.name}</td>
+                                        <td>
+                                            <a href="#displayedplot" onclick="show_plot('${result.link.href}')" class="btn btn-secondary btn-sm">View Plot</a>
+                                            <a href="${result.link.href}?download" target="_blank" class="btn btn-secondary btn-sm">Download</a> 
+                                            <a href="#" onclick="window.open('${result.link.href}');" class="btn btn-secondary btn-sm">Open in New Tab</a></td></tr>`;
+                else
+                    result_html += `<tr><td>${result.link.name}</td>
+                                        <td>
+                                            <a href="${result.link.href}?download" target="_blank" class="btn btn-secondary btn-sm">Download</a> 
+                                            <a href="#" onclick="window.open('${result.link.href}');" class="btn btn-secondary btn-sm">Open in New Tab</a></td></tr>`;
             }
-            result_html += "</tbody></table>";
+            result_html += "</tbody></table><div id='displayedplot' class='row'></div>";
             document.getElementById('job-results').innerHTML = result_html;
         }
     }
