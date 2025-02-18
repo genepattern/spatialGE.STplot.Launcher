@@ -198,7 +198,7 @@ Vue.createApp({
             
             window.show_plot = (url) => {
                 document.querySelector('#displayedplot').innerHTML = 
-                    `<img src="${url}" class="img mx-auto d-block" style="max-width: 500px;">`;
+                    `<img src="${url}" class="img mx-auto d-block" style="width: 500px; height: 500px; max-width: 500px;">`;
             };
 
             // Show the job results
