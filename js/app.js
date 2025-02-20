@@ -1,8 +1,46 @@
-import { param, run, poll_job } from '../visualizer/genepattern/visualizer_utils.js'
+import { param, run, poll_job, auth_token } from '/gp/visualizer/v1/genepattern/visualizer_utils.js'
 import Tags from "../visualizer/bootstrap/js/tags.js";
 
-// 
-window.Tags = Tags;
+async function write_session(job_id, session_content, filename='session.json') {
+    try {
+        return await fetch(`/gp/rest/v1/data/upload/job_output?jobid=${job_id}&name=${filename}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'GenePatternRest',
+                'Authorization': `Bearer ${auth_token()}`
+            },
+            body: JSON.stringify(session_content)
+        }).then(response => response.json());
+    }
+    catch (e) {
+        console.error('Unable to write session.json');
+        return null;
+    }
+}
+
+async function fetch_session(job_id) {
+    const session_url = `/gp/jobResults/${job_id}/session.json`;
+    const session = await fetch(session_url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${auth_token()}`
+            }
+        });
+    if (session.ok) return await session.json()
+    else return false;
+}
+
+async function fetch_job(job_id) {
+    return fetch(`/gp/rest/v1/jobs/${job_id}/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'GenePatternRest',
+            'Authorization': `Bearer ${auth_token()}`
+        }
+    }).then(response => response.json())
+}
 
 Vue.createApp({
     data() {
@@ -29,6 +67,7 @@ Vue.createApp({
         };
     },
     created: function() {
+        this.fetch_session();
         this.fetch_samples();
         this.fetch_genes();
         this.fetch_domains();
@@ -70,6 +109,23 @@ Vue.createApp({
         toggle_samples() {
             const selected = document.getElementById('check-all')?.checked;
             this.samples.forEach(item => (item.selected = selected));
+        },
+        async fetch_session() {
+            const launcher_job_id = param('job.id');
+            if (!launcher_job_id) return false;
+            else {
+                const session = await fetch_session(launcher_job_id);
+                if (session) {
+                    const reload_button = document.querySelector('#reload-session');
+                    reload_button.addEventListener('click', () => {
+                        this.handle_submit(null, session.job);
+                    });
+                    reload_button.classList.remove('d-none');
+                }
+                
+                return true;
+            }
+            
         },
         fetch_samples() {
             let samples_url = param('sample.info');
@@ -159,14 +215,15 @@ Vue.createApp({
             // Placeholder for custom validation, for now rely on browser default
             return true;
         },
-        async handle_submit() {
-            if (!this.validate()) return;
+        async handle_submit(event, job_id=null) {
+            if (!job_id) if (!this.validate()) return;
 
            $('#form-collapse').collapse('hide');
            $('#results-collapse').removeClass('d-none');
-
-            document.getElementById('job-status').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting';
-            let job = await run('spatialGE.STplot',
+           
+           const initial_status = job_id ? 'Loading' : 'Submitting';
+            document.getElementById('job-status').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${initial_status}`;
+            let job = !job_id ? await run('spatialGE.STplot',
                 [
                     {'name': 'input.file', 'values': [param('dataset')]},
                     {'name': 'genes', 'values': [this.form.genes.join(',')]},
@@ -183,7 +240,14 @@ Vue.createApp({
                     {'name': 'grid.columns', 'values': [this.form.columns]},
                     {'name': 'common.legend', 'values': [this.form.legend]},
                     {'name': 'legend.location', 'values': [this.form.location]}
-                ]);
+                ]) :
+                await fetch_job(job_id);
+            
+            // Write session file
+            if (!job_id) {
+                let launcher_job_id = param('job.id');
+                if (launcher_job_id) write_session(launcher_job_id, {job: job.jobId});
+            }
 
             // Poll for completion
             job = await poll_job(job, update => {
