@@ -225,7 +225,7 @@ Vue.createApp({
             document.getElementById('job-status').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${initial_status}`;
             let job = !job_id ? await run('spatialGE.STplot',
                 [
-                    {'name': 'input.file', 'values': [param('dataset')]},
+                    {'name': 'input.file', 'values': [param('dataset', true)]},
                     {'name': 'genes', 'values': [this.form.genes.join(',')]},
                     {'name': 'samples', 'values': [this.checked_samples()]},
                     {'name': 'color.palette', 'values': [this.form.colors]},
